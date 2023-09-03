@@ -10,9 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:singleLine="true"
+        android:gravity="center"
+        android:layout_gravity="top|center"
         tools:text="455"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:gravity="center"
-        android:layout_gravity="center"/>
+        android:layout_marginTop="4dp" />
 </LinearLayout>
