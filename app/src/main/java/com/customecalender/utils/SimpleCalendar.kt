@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +16,13 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.doOnLayout
 import com.customecalender.R
 import com.customecalender.databinding.LayoutDayBinding
+import com.customecalender.databinding.TripBreakdownBarBinding
 import java.util.Calendar
+import java.util.Date
 
 
 class SimpleCalendar : LinearLayout {
@@ -238,6 +243,9 @@ class SimpleCalendar : LinearLayout {
             dayView.root.setOnClickListener { v -> onDayClick(v) }
         }
         calendar!![chosenDateYear, chosenDateMonth] = chosenDateDay
+
+
+        drawBar(Date(), Date())
     }
 
     fun onDayClick(view: View?) {
@@ -307,7 +315,29 @@ class SimpleCalendar : LinearLayout {
                  daysWidth = llRoot!!.getMeasuredWidth()
             }
         })
+    }
 
+    fun drawBar(startDate: Date, endDate: Date) {
+        val constrainLayout = findViewById<ConstraintLayout>(R.id.constrain_week_1)
+        val binding = TripBreakdownBarBinding.inflate(LayoutInflater.from(context), this, false)
+        val intArray = IntArray(2)
+        days[3]?.root?.doOnLayout {
+            it.getLocationOnScreen(intArray)
+            Log.d("width", intArray[0].toString())
+        }
+        val layoutParams = getBarParams()
+        binding.llTripBreakdown.layoutParams = layoutParams
+        layoutParams.startToStart = constrainLayout.id
+        layoutParams.endToEnd = constrainLayout.id
+        layoutParams.topToTop = constrainLayout.id
+        layoutParams.marginStart = 470
+        layoutParams.marginEnd = 20
+        constrainLayout.addView(binding.llTripBreakdown)
+        binding.llTripBreakdown.setBackgroundColor(Color.BLUE)
+    }
+
+    private fun getBarParams(): ConstraintLayout.LayoutParams {
+        return ConstraintLayout.LayoutParams(0, 20)
     }
 
     private fun getdaysLayoutParams(): LayoutParams {

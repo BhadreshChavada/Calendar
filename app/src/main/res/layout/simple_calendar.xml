@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     android:orientation="vertical"
     android:id="@+id/llRoot">
@@ -109,12 +110,24 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/calendar_week_1"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constrain_week_1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="7" />
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/calendar_week_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="7"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <LinearLayout
         android:id="@+id/calendar_week_2"
