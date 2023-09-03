@@ -21,6 +21,7 @@ import androidx.core.view.doOnLayout
 import com.customecalender.R
 import com.customecalender.databinding.LayoutDayBinding
 import com.customecalender.databinding.TripBreakdownBarBinding
+import com.customecalender.databinding.TripBreakdownTitleBinding
 import java.util.Calendar
 import java.util.Date
 
@@ -245,7 +246,13 @@ class SimpleCalendar : LinearLayout {
         calendar!![chosenDateYear, chosenDateMonth] = chosenDateDay
 
 
-        drawBar(Date(), Date())
+        multiColorDrawBar(Date(), Date(),470,150,Color.GREEN,1)
+        multiColorDrawBar(Date(), Date(),40,350,Color.CYAN,2)
+        multiColorDrawBar(Date(), Date(),80,350,Color.BLUE,2)
+        multiColorDrawBar(Date(), Date(),130,350,Color.RED,2)
+        multiColorDrawBar(Date(), Date(),500,350,Color.GREEN,2)
+        textBar(Date(), Date(),470,1)
+        textBar(Date(), Date(),40,2)
     }
 
     fun onDayClick(view: View?) {
@@ -291,16 +298,8 @@ class SimpleCalendar : LinearLayout {
         for (weekNumber in 0..5) {
             for (dayInWeek in 0..6) {
                 val day = LayoutDayBinding.inflate(LayoutInflater.from(context), this, false)
-//                val day = Button(context)
-//                day.setTextColor(Color.parseColor(CUSTOM_GREY))
-//                day.setPadding(10,10,10,10)
-//                day.background = resources.getDrawable(R.drawable.bg_border)
-//                day.root.layoutParams = buttonParams
-//                day.textSize = (metrics.density.toInt() * 8).toFloat()
-//                day.setSingleLine()
                 day.root.layoutParams = buttonParams
                 days[engDaysArrayCounter] = day
-//                weeks[weekNumber]!!.removeAllViews()
                 weeks[weekNumber]!!.addView(day.root)
                 ++engDaysArrayCounter
             }
@@ -331,19 +330,82 @@ class SimpleCalendar : LinearLayout {
         layoutParams.endToEnd = constrainLayout.id
         layoutParams.topToTop = constrainLayout.id
         layoutParams.marginStart = 470
+        layoutParams.topMargin = 150
         layoutParams.marginEnd = 20
         constrainLayout.addView(binding.llTripBreakdown)
         binding.llTripBreakdown.setBackgroundColor(Color.BLUE)
     }
 
+    fun textBar(startDate: Date, endDate: Date,marginStart: Int,week: Int) {
+        var constrainLayout : ConstraintLayout
+        when(week){
+            1 -> constrainLayout = findViewById(R.id.constrain_week_1)
+            2-> constrainLayout = findViewById(R.id.constrain_week_2)
+            3-> constrainLayout = findViewById(R.id.constrain_week_3)
+            4-> constrainLayout = findViewById(R.id.constrain_week_4)
+            5-> constrainLayout = findViewById(R.id.constrain_week_5)
+            6-> constrainLayout = findViewById(R.id.constrain_week_6)
+            else -> constrainLayout = findViewById(R.id.constrain_week_1)
+        }
+        val binding = TripBreakdownTitleBinding.inflate(LayoutInflater.from(context), this, false)
+        val intArray = IntArray(2)
+        days[3]?.root?.doOnLayout {
+            it.getLocationOnScreen(intArray)
+            Log.d("width", intArray[0].toString())
+        }
+        val layoutParams = getTextBarParams()
+        binding.tvTripBreakdown.layoutParams = layoutParams
+        layoutParams.startToStart = constrainLayout.id
+        layoutParams.endToEnd = constrainLayout.id
+        layoutParams.topToTop = constrainLayout.id
+        layoutParams.marginStart = marginStart
+        layoutParams.topMargin = 100
+        constrainLayout.addView(binding.tvTripBreakdown)
+
+    }
+
+    fun multiColorDrawBar(startDate: Date, endDate: Date, marginStart :Int, marginEnd:Int,color:Int,week:Int) {
+        var constrainLayout : ConstraintLayout
+        when(week){
+            1 -> constrainLayout = findViewById(R.id.constrain_week_1)
+            2-> constrainLayout = findViewById(R.id.constrain_week_2)
+            3-> constrainLayout = findViewById(R.id.constrain_week_3)
+            4-> constrainLayout = findViewById(R.id.constrain_week_4)
+            5-> constrainLayout = findViewById(R.id.constrain_week_5)
+            6-> constrainLayout = findViewById(R.id.constrain_week_6)
+            else -> constrainLayout = findViewById(R.id.constrain_week_1)
+        }
+
+        val binding = TripBreakdownBarBinding.inflate(LayoutInflater.from(context), this, false)
+        val intArray = IntArray(2)
+        days[3]?.root?.doOnLayout {
+            it.getLocationOnScreen(intArray)
+            Log.d("width", intArray[0].toString())
+        }
+        val layoutParams = getBarParams()
+        binding.llTripBreakdown.layoutParams = layoutParams
+        layoutParams.startToStart = constrainLayout.id
+        layoutParams.endToEnd = constrainLayout.id
+        layoutParams.topToTop = constrainLayout.id
+        layoutParams.marginStart = marginStart
+        layoutParams.topMargin = 150
+        layoutParams.marginEnd = marginEnd
+        constrainLayout.addView(binding.llTripBreakdown)
+        binding.llTripBreakdown.setBackgroundColor(color)
+    }
+
     private fun getBarParams(): ConstraintLayout.LayoutParams {
-        return ConstraintLayout.LayoutParams(0, 20)
+        return ConstraintLayout.LayoutParams(0, 30)
+    }
+
+    private fun getTextBarParams(): ConstraintLayout.LayoutParams {
+        return ConstraintLayout.LayoutParams(0, 40)
     }
 
     private fun getdaysLayoutParams(): LayoutParams {
         val buttonParams = LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            200
+            250
         )
         buttonParams.weight = 1f
         return buttonParams
@@ -377,5 +439,6 @@ class SimpleCalendar : LinearLayout {
             "May", "June", "July", "August",
             "September", "October", "November", "December"
         )
+
     }
 }
