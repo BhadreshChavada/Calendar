@@ -246,13 +246,13 @@ class SimpleCalendar : LinearLayout {
         calendar!![chosenDateYear, chosenDateMonth] = chosenDateDay
 
 
-        multiColorDrawBar(Date(), Date(),470,150,Color.GREEN,1)
-        multiColorDrawBar(Date(), Date(),40,350,Color.CYAN,2)
-        multiColorDrawBar(Date(), Date(),80,350,Color.BLUE,2)
-        multiColorDrawBar(Date(), Date(),130,350,Color.RED,2)
-        multiColorDrawBar(Date(), Date(),500,350,Color.GREEN,2)
-        textBar(Date(), Date(),470,1)
-        textBar(Date(), Date(),40,2)
+//        multiColorDrawBar(Date(), Date(),470,150,Color.GREEN,1)
+//        multiColorDrawBar(Date(), Date(),40,350,Color.CYAN,2)
+//        multiColorDrawBar(Date(), Date(),80,350,Color.BLUE,2)
+//        multiColorDrawBar(Date(), Date(),130,350,Color.RED,2)
+//        multiColorDrawBar(Date(), Date(),500,350,Color.GREEN,2)
+//        textBar(Date(), Date(),470,1)
+//        textBar(Date(), Date(),40,2)
     }
 
     fun onDayClick(view: View?) {
@@ -364,7 +364,7 @@ class SimpleCalendar : LinearLayout {
 
     }
 
-    fun multiColorDrawBar(startDate: Date, endDate: Date, marginStart :Int, marginEnd:Int,color:Int,week:Int) {
+    fun multiColorDrawBar (marginStart :Int, marginEnd:Int,color:Int,week:Int) {
         var constrainLayout : ConstraintLayout
         when(week){
             1 -> constrainLayout = findViewById(R.id.constrain_week_1)
@@ -377,11 +377,11 @@ class SimpleCalendar : LinearLayout {
         }
 
         val binding = TripBreakdownBarBinding.inflate(LayoutInflater.from(context), this, false)
-        val intArray = IntArray(2)
-        days[3]?.root?.doOnLayout {
-            it.getLocationOnScreen(intArray)
-            Log.d("width", intArray[0].toString())
-        }
+//        val intArray = IntArray(2)
+//        days[3]?.root?.doOnLayout {
+//            it.getLocationOnScreen(intArray)
+//            Log.d("width", intArray[0].toString())
+//        }
         val layoutParams = getBarParams()
         binding.llTripBreakdown.layoutParams = layoutParams
         layoutParams.startToStart = constrainLayout.id
