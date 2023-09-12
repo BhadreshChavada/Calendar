@@ -336,7 +336,7 @@ class SimpleCalendar : LinearLayout {
         binding.llTripBreakdown.setBackgroundColor(Color.BLUE)
     }
 
-    fun textBar(startDate: Date, endDate: Date,marginStart: Int,week: Int) {
+    fun textBar(marginStart :Int, week:Int,text:String) {
         var constrainLayout : ConstraintLayout
         when(week){
             1 -> constrainLayout = findViewById(R.id.constrain_week_1)
@@ -348,6 +348,7 @@ class SimpleCalendar : LinearLayout {
             else -> constrainLayout = findViewById(R.id.constrain_week_1)
         }
         val binding = TripBreakdownTitleBinding.inflate(LayoutInflater.from(context), this, false)
+        binding.tvTripBreakdown.text = text
         val intArray = IntArray(2)
         days[3]?.root?.doOnLayout {
             it.getLocationOnScreen(intArray)
