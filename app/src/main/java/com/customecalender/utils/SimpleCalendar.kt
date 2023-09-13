@@ -245,14 +245,6 @@ class SimpleCalendar : LinearLayout {
         }
         calendar!![chosenDateYear, chosenDateMonth] = chosenDateDay
 
-
-//        multiColorDrawBar(Date(), Date(),470,150,Color.GREEN,1)
-//        multiColorDrawBar(Date(), Date(),40,350,Color.CYAN,2)
-//        multiColorDrawBar(Date(), Date(),80,350,Color.BLUE,2)
-//        multiColorDrawBar(Date(), Date(),130,350,Color.RED,2)
-//        multiColorDrawBar(Date(), Date(),500,350,Color.GREEN,2)
-//        textBar(Date(), Date(),470,1)
-//        textBar(Date(), Date(),40,2)
     }
 
     fun onDayClick(view: View?) {
@@ -316,26 +308,6 @@ class SimpleCalendar : LinearLayout {
         })
     }
 
-    fun drawBar(startDate: Date, endDate: Date) {
-        val constrainLayout = findViewById<ConstraintLayout>(R.id.constrain_week_1)
-        val binding = TripBreakdownBarBinding.inflate(LayoutInflater.from(context), this, false)
-        val intArray = IntArray(2)
-        days[3]?.root?.doOnLayout {
-            it.getLocationOnScreen(intArray)
-            Log.d("width", intArray[0].toString())
-        }
-        val layoutParams = getBarParams()
-        binding.llTripBreakdown.layoutParams = layoutParams
-        layoutParams.startToStart = constrainLayout.id
-        layoutParams.endToEnd = constrainLayout.id
-        layoutParams.topToTop = constrainLayout.id
-        layoutParams.marginStart = 470
-        layoutParams.topMargin = 150
-        layoutParams.marginEnd = 20
-        constrainLayout.addView(binding.llTripBreakdown)
-        binding.llTripBreakdown.setBackgroundColor(Color.BLUE)
-    }
-
     fun textBar(marginStart :Int, week:Int,text:String) {
         var constrainLayout : ConstraintLayout
         when(week){
@@ -378,11 +350,6 @@ class SimpleCalendar : LinearLayout {
         }
 
         val binding = TripBreakdownBarBinding.inflate(LayoutInflater.from(context), this, false)
-//        val intArray = IntArray(2)
-//        days[3]?.root?.doOnLayout {
-//            it.getLocationOnScreen(intArray)
-//            Log.d("width", intArray[0].toString())
-//        }
         val layoutParams = getBarParams()
         binding.llTripBreakdown.layoutParams = layoutParams
         layoutParams.startToStart = constrainLayout.id

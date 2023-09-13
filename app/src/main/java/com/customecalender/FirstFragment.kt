@@ -41,7 +41,7 @@ class FirstFragment : Fragment() {
 
 
         drawLines("2023-09-01","2023-09-02","Test")
-        drawLines("2023-09-09","2023-09-14","Hello")
+        drawLines("2023-09-03","2023-09-13","Hello")
 
 
     }
@@ -57,6 +57,8 @@ class FirstFragment : Fragment() {
             val endDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(endDateString);
 
             val calendarInstance = Calendar.getInstance()
+            calendarInstance.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+
             calendarInstance.timeInMillis = startDate.time
             val startDateWeekOfMonth = calendarInstance.get(Calendar.WEEK_OF_MONTH)
 
@@ -68,21 +70,64 @@ class FirstFragment : Fragment() {
                 weekStartDay = LocalDate.parse(startDateString).dayOfWeek.value
                 weekEndDay = LocalDate.parse(endDateString).dayOfWeek.value
 
-                if(startDateWeekOfMonth != endDateWeekOfMonth){
+                if (startDateWeekOfMonth != endDateWeekOfMonth) {
                     val width = (_binding?.squareDay?.width ?: 1) / 7
-                    _binding?.squareDay?.multiColorDrawBar(width*weekStartDay,0, Color.GREEN,startDateWeekOfMonth)
-                    _binding?.squareDay?.multiColorDrawBar(0,width*(6-weekEndDay), Color.GREEN,endDateWeekOfMonth)
+                    for (i in startDateWeekOfMonth..endDateWeekOfMonth) {
+                        if(weekStartDay == 7){
+                            weekStartDay=0
+                        }
+                        if (i == startDateWeekOfMonth) {
+                            _binding?.squareDay?.multiColorDrawBar(
+                                width * weekStartDay,
+                                0,
+                                Color.GREEN,
+                                startDateWeekOfMonth
+                            )
+                        } else if (i == endDateWeekOfMonth) {
+                            _binding?.squareDay?.multiColorDrawBar(
+                                0,
+                                width * (6 - weekEndDay),
+                                Color.GREEN,
+                                endDateWeekOfMonth
+                            )
+                        } else {
+                            _binding?.squareDay?.multiColorDrawBar(
+                                0,
+                                0,
+                                Color.GREEN,
+                                i
+                            )
+                        }
+                    }
+                    if (startDateTitle.isNotEmpty()) {
+                        _binding?.squareDay?.textBar(
+                            width * weekStartDay,
+                            startDateWeekOfMonth,
+                            startDateTitle
+                        )
+                    }
 
-                    _binding?.squareDay?.textBar(width*weekStartDay,startDateWeekOfMonth, startDateTitle)
-                }else{
+                } else {
                     val width = (_binding?.squareDay?.width ?: 1) / 7
-                    _binding?.squareDay?.multiColorDrawBar(width*weekStartDay,width*(6-weekEndDay), Color.GREEN,startDateWeekOfMonth)
-                    _binding?.squareDay?.textBar(width*weekStartDay,startDateWeekOfMonth, startDateTitle)
+                    if(weekStartDay == 7){
+                        weekStartDay=0
+                    }
+                    _binding?.squareDay?.multiColorDrawBar(
+                        width * weekStartDay,
+                        width * (6 - weekEndDay),
+                        Color.GREEN,
+                        startDateWeekOfMonth
+                    )
+
+                    if (startDateTitle.isNotEmpty()) {
+                        _binding?.squareDay?.textBar(
+                            width * weekStartDay,
+                            startDateWeekOfMonth,
+                            startDateTitle
+                        )
+                    }
                 }
             }
-
-
-
         }
     }
 
