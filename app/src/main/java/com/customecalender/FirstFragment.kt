@@ -39,14 +39,24 @@ class FirstFragment : Fragment() {
 //        val startDate =
 //        val pairingData = PairingsData()
 
+        val array = arrayListOf<TripBreakdownData>()
+        array.add(TripBreakdownData(1, 0.10))
+        array.add(TripBreakdownData(3, 0.50))
+        array.add(TripBreakdownData(4, 0.15))
+        array.add(TripBreakdownData(6, 0.10))
+        array.add(TripBreakdownData(1, 0.15))
 
-        drawLines("2023-09-01","2023-09-02","Test")
-        drawLines("2023-09-09","2023-09-14","Hello")
+        drawLines("2023-09-04","2023-09-07","Test", array)
+//        drawLines("2023-09-09","2023-09-14","Hello")
 
 
     }
 
-    fun drawLines(startDateString :String,endDateString:String,startDateTitle:String){
+    fun drawLines(
+        startDateString: String,
+        endDateString: String,
+        startDateTitle: String,
+        array: ArrayList<TripBreakdownData>){
         _binding?.squareDay?.post {
 
 
@@ -70,13 +80,25 @@ class FirstFragment : Fragment() {
 
                 if(startDateWeekOfMonth != endDateWeekOfMonth){
                     val width = (_binding?.squareDay?.width ?: 1) / 7
-                    _binding?.squareDay?.multiColorDrawBar(width*weekStartDay,0, Color.GREEN,startDateWeekOfMonth)
-                    _binding?.squareDay?.multiColorDrawBar(0,width*(6-weekEndDay), Color.GREEN,endDateWeekOfMonth)
+                    _binding?.squareDay?.multiColorDrawBar(
+                        width*weekStartDay,
+                        0,
+                        Color.GREEN,
+                        startDateWeekOfMonth,
+                        array
+                    )
+                    _binding?.squareDay?.multiColorDrawBar(
+                        0,
+                        width*(6-weekEndDay),
+                        Color.GREEN,
+                        endDateWeekOfMonth,
+                        array
+                    )
 
                     _binding?.squareDay?.textBar(width*weekStartDay,startDateWeekOfMonth, startDateTitle)
                 }else{
                     val width = (_binding?.squareDay?.width ?: 1) / 7
-                    _binding?.squareDay?.multiColorDrawBar(width*weekStartDay,width*(6-weekEndDay), Color.GREEN,startDateWeekOfMonth)
+                    _binding?.squareDay?.multiColorDrawBar(width*weekStartDay,width*(6-weekEndDay), Color.GREEN,startDateWeekOfMonth, array)
                     _binding?.squareDay?.textBar(width*weekStartDay,startDateWeekOfMonth, startDateTitle)
                 }
             }

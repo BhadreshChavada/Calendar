@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnLayout
 import com.customecalender.R
+import com.customecalender.TripBreakdownData
 import com.customecalender.databinding.LayoutDayBinding
 import com.customecalender.databinding.TripBreakdownBarBinding
 import com.customecalender.databinding.TripBreakdownTitleBinding
@@ -365,7 +366,12 @@ class SimpleCalendar : LinearLayout {
 
     }
 
-    fun multiColorDrawBar (marginStart :Int, marginEnd:Int,color:Int,week:Int) {
+    fun multiColorDrawBar (
+        marginStart: Int,
+        marginEnd: Int,
+        color: Int,
+        week: Int,
+        array: ArrayList<TripBreakdownData>, ) {
         var constrainLayout : ConstraintLayout
         when(week){
             1 -> constrainLayout = findViewById(R.id.constrain_week_1)
@@ -385,6 +391,7 @@ class SimpleCalendar : LinearLayout {
 //        }
         val layoutParams = getBarParams()
         binding.llTripBreakdown.layoutParams = layoutParams
+//        binding.llTripBreakdown.weightSum = 1f
         layoutParams.startToStart = constrainLayout.id
         layoutParams.endToEnd = constrainLayout.id
         layoutParams.topToTop = constrainLayout.id
@@ -393,8 +400,43 @@ class SimpleCalendar : LinearLayout {
         layoutParams.marginEnd = marginEnd
         constrainLayout.addView(binding.llTripBreakdown)
         binding.llTripBreakdown.setBackgroundColor(color)
+
+        for (i in array) {
+            val view = View(context);
+            val lparams = LayoutParams(0, LayoutParams.WRAP_CONTENT,
+                (i.Percentage).toFloat()
+            )
+            view.layoutParams = lparams
+            view.setBackgroundColor(getColor(i.BreakdownType))
+            binding.llTripBreakdown.addView(view)
+        }
     }
 
+    fun getColor(index : Int): Int {
+        return when(index){
+            1 -> {
+                Color.RED
+            }
+            2 -> {
+                Color.BLUE
+            }
+            3 -> {
+                Color.GREEN
+            }
+            4 -> {
+                Color.CYAN
+            }
+            5 -> {
+                Color.DKGRAY
+            }
+            6 -> {
+                Color.GRAY
+            }
+            else -> {
+                Color.BLACK
+            }
+        }
+    }
     private fun getBarParams(): ConstraintLayout.LayoutParams {
         return ConstraintLayout.LayoutParams(0, 30)
     }
