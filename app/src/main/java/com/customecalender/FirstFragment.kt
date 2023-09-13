@@ -39,14 +39,24 @@ class FirstFragment : Fragment() {
 //        val startDate =
 //        val pairingData = PairingsData()
 
+        val array = arrayListOf<TripBreakdownData>()
+        array.add(TripBreakdownData(1, 0.10))
+        array.add(TripBreakdownData(3, 0.50))
+        array.add(TripBreakdownData(4, 0.15))
+        array.add(TripBreakdownData(6, 0.10))
+        array.add(TripBreakdownData(1, 0.15))
 
-        drawLines("2023-09-01","2023-09-02","Test")
-        drawLines("2023-09-03","2023-09-13","Hello")
+        drawLines("2023-09-04","2023-09-07","Test", array)
+//        drawLines("2023-09-03","2023-09-13","Hello")
 
 
     }
 
-    fun drawLines(startDateString :String,endDateString:String,startDateTitle:String){
+    fun drawLines(
+        startDateString: String,
+        endDateString: String,
+        startDateTitle: String,
+        array: ArrayList<TripBreakdownData>){
         _binding?.squareDay?.post {
 
 
