@@ -23,8 +23,10 @@ import com.customecalender.TripBreakdownData
 import com.customecalender.databinding.LayoutDayBinding
 import com.customecalender.databinding.TripBreakdownBarBinding
 import com.customecalender.databinding.TripBreakdownTitleBinding
+import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
-import java.util.Date
+import java.util.Locale
 
 
 class SimpleCalendar : LinearLayout {
@@ -338,12 +340,12 @@ class SimpleCalendar : LinearLayout {
 
     }
 
-    fun multiColorDrawBar (
+    private fun multiColorDrawBar (
         marginStart: Int,
         marginEnd: Int,
-        color: Int,
         week: Int,
-        array: ArrayList<TripBreakdownData>, ) {
+        array: ArrayList<TripBreakdownData>,
+        singleColor: Boolean, ) {
         var constrainLayout : ConstraintLayout
         when(week){
             1 -> constrainLayout = findViewById(R.id.constrain_week_1)
@@ -366,7 +368,6 @@ class SimpleCalendar : LinearLayout {
         layoutParams.topMargin = 150
         layoutParams.marginEnd = marginEnd
         constrainLayout.addView(binding.llTripBreakdown)
-        binding.llTripBreakdown.setBackgroundColor(color)
 
         for (i in array) {
             val view = View(context);
@@ -374,7 +375,12 @@ class SimpleCalendar : LinearLayout {
                 (i.Percentage).toFloat()
             )
             view.layoutParams = lparams
-            view.setBackgroundColor(getColor(i.BreakdownType))
+            if(singleColor){
+                view.setBackgroundColor(Color.GREEN)
+            }else{
+                view.setBackgroundColor(getColor(i.BreakdownType))
+            }
+
             binding.llTripBreakdown.addView(view)
         }
     }
@@ -450,5 +456,101 @@ class SimpleCalendar : LinearLayout {
             "September", "October", "November", "December"
         )
 
+    }
+
+    fun drawLines(
+        calenderView: SimpleCalendar?,
+        startDateString: String,
+        endDateString: String,
+        startDateTitle: String,
+        array: ArrayList<TripBreakdownData>,
+        singleColor:Boolean = false
+    ){
+        calenderView?.post {
+
+
+            var weekStartDay =1
+            var weekEndDay =1
+
+            val startDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(startDateString);
+            val endDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(endDateString);
+
+            val calendarInstance = Calendar.getInstance()
+            calendarInstance.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+
+            calendarInstance.timeInMillis = startDate.time
+            val startDateWeekOfMonth = calendarInstance.get(Calendar.WEEK_OF_MONTH)
+
+            calendarInstance.timeInMillis = endDate.time
+            val endDateWeekOfMonth = calendarInstance.get(Calendar.WEEK_OF_MONTH)
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                weekStartDay = LocalDate.parse(startDateString).dayOfWeek.value
+                weekEndDay = LocalDate.parse(endDateString).dayOfWeek.value
+
+                if (startDateWeekOfMonth != endDateWeekOfMonth) {
+                    val width = (this.width ?: 1) / 7
+                    for (i in startDateWeekOfMonth..endDateWeekOfMonth) {
+                        if(weekStartDay == 7){
+                            weekStartDay=0
+                        }
+                        if (i == startDateWeekOfMonth) {
+                            this.multiColorDrawBar(
+                                width * weekStartDay,
+                                0,
+                                startDateWeekOfMonth,
+                                array,
+                                singleColor
+                            )
+                        } else if (i == endDateWeekOfMonth) {
+                            this.multiColorDrawBar(
+                                0,
+                                width * (6 - weekEndDay),
+                                endDateWeekOfMonth,
+                                array,
+                                singleColor
+                            )
+                        } else {
+                            this.multiColorDrawBar(
+                                0,
+                                0,
+                                i,
+                                array,
+                                singleColor
+                            )
+                        }
+                    }
+                    if (startDateTitle.isNotEmpty()) {
+                        this.textBar(
+                            width * weekStartDay,
+                            startDateWeekOfMonth,
+                            startDateTitle
+                        )
+                    }
+
+                } else {
+                    val width = (this.width ?: 1) / 7
+                    if(weekStartDay == 7){
+                        weekStartDay=0
+                    }
+                    this.multiColorDrawBar(
+                        width * weekStartDay,
+                        width * (6 - weekEndDay),
+                        startDateWeekOfMonth,
+                        array,
+                        singleColor
+                    )
+
+                    if (startDateTitle.isNotEmpty()) {
+                        this.textBar(
+                            width * weekStartDay,
+                            startDateWeekOfMonth,
+                            startDateTitle
+                        )
+                    }
+                }
+            }
+        }
     }
 }
