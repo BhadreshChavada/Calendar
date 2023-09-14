@@ -30,8 +30,6 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        val startDate =
-//        val pairingData = PairingsData()
 
         val array = arrayListOf<TripBreakdownData>()
         array.add(TripBreakdownData(1, 0.10))
@@ -42,16 +40,16 @@ class FirstFragment : Fragment() {
 
         _binding?.squareDay?.drawLines(
             _binding?.squareDay,
-            "2023-09-04",
-            "2023-09-07",
+            "2023-09-05T10:00:00",
+            "2023-09-08T08:00:00",
             "Multiple Color",
             array
         )
 
         _binding?.squareDay?.drawLines(
             _binding?.squareDay,
-            "2023-09-15",
-            "2023-09-19",
+            "2023-09-15T14:00:00",
+            "2023-09-19T23:00:00",
             "Single Color",
             array,
             true

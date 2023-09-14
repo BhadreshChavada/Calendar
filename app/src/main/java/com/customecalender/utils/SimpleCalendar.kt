@@ -26,6 +26,7 @@ import com.customecalender.databinding.TripBreakdownTitleBinding
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 
@@ -340,12 +341,13 @@ class SimpleCalendar : LinearLayout {
 
     }
 
-    private fun multiColorDrawBar (
+    private fun multiColorDrawBar(
         marginStart: Int,
         marginEnd: Int,
         week: Int,
         array: ArrayList<TripBreakdownData>,
-        singleColor: Boolean, ) {
+        singleColor: Boolean,
+    ) {
         var constrainLayout : ConstraintLayout
         when(week){
             1 -> constrainLayout = findViewById(R.id.constrain_week_1)
@@ -468,12 +470,11 @@ class SimpleCalendar : LinearLayout {
     ){
         calenderView?.post {
 
-
             var weekStartDay =1
             var weekEndDay =1
 
-            val startDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(startDateString);
-            val endDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(endDateString);
+            val startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).parse(startDateString)
+            val endDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).parse(endDateString);
 
             val calendarInstance = Calendar.getInstance()
             calendarInstance.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
@@ -486,8 +487,8 @@ class SimpleCalendar : LinearLayout {
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                weekStartDay = LocalDate.parse(startDateString).dayOfWeek.value
-                weekEndDay = LocalDate.parse(endDateString).dayOfWeek.value
+                weekStartDay = LocalDate.parse(reFormatDate(startDateString)).dayOfWeek.value
+                weekEndDay = LocalDate.parse(reFormatDate(endDateString)).dayOfWeek.value
 
                 if (startDateWeekOfMonth != endDateWeekOfMonth) {
                     val width = (this.width ?: 1) / 7
@@ -496,17 +497,22 @@ class SimpleCalendar : LinearLayout {
                             weekStartDay=0
                         }
                         if (i == startDateWeekOfMonth) {
+                            val additionalStartMargin =
+                                width * getHrMinFromDate(startDateString) / (24 * 60)
+
                             this.multiColorDrawBar(
-                                width * weekStartDay,
+                                (width * weekStartDay) + additionalStartMargin,
                                 0,
                                 startDateWeekOfMonth,
                                 array,
                                 singleColor
                             )
                         } else if (i == endDateWeekOfMonth) {
+                            val additionalEndMargin = width - (width * getHrMinFromDate(endDateString) / (24 * 60))
+
                             this.multiColorDrawBar(
                                 0,
-                                width * (6 - weekEndDay),
+                                (width * (6 - weekEndDay))+additionalEndMargin,
                                 endDateWeekOfMonth,
                                 array,
                                 singleColor
@@ -522,8 +528,10 @@ class SimpleCalendar : LinearLayout {
                         }
                     }
                     if (startDateTitle.isNotEmpty()) {
+                        val additionalStartMargin =
+                            width * getHrMinFromDate(startDateString) / (24 * 60)
                         this.textBar(
-                            width * weekStartDay,
+                            (width * weekStartDay)+ additionalStartMargin,
                             startDateWeekOfMonth,
                             startDateTitle
                         )
@@ -534,9 +542,13 @@ class SimpleCalendar : LinearLayout {
                     if(weekStartDay == 7){
                         weekStartDay=0
                     }
+
+                    val additionalStartMargin =
+                        width * getHrMinFromDate(startDateString) / (24 * 60)
+                    val additionalEndMargin = width - (width * getHrMinFromDate(endDateString) / (24 * 60))
                     this.multiColorDrawBar(
-                        width * weekStartDay,
-                        width * (6 - weekEndDay),
+                        (width * weekStartDay) + additionalStartMargin,
+                        (width * (6 - weekEndDay)) + additionalEndMargin,
                         startDateWeekOfMonth,
                         array,
                         singleColor
@@ -544,7 +556,7 @@ class SimpleCalendar : LinearLayout {
 
                     if (startDateTitle.isNotEmpty()) {
                         this.textBar(
-                            width * weekStartDay,
+                            (width * weekStartDay)+ additionalStartMargin ,
                             startDateWeekOfMonth,
                             startDateTitle
                         )
@@ -552,5 +564,25 @@ class SimpleCalendar : LinearLayout {
                 }
             }
         }
+    }
+
+    fun reFormatDate(date:String): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+        val output = SimpleDateFormat("yyyy-MM-dd")
+        val d: Date = sdf.parse(date)
+        val formattedTime = output.format(d)
+        return formattedTime
+    }
+
+    fun getHrMinFromDate(date:String): Int {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+        val hr = SimpleDateFormat("HH")
+        val hrd: Date = sdf.parse(date)
+        val formattedHr = hr.format(hrd)
+
+        val min = SimpleDateFormat("mm")
+        val mnd: Date = sdf.parse(date)
+        val formattedMin = min.format(mnd)
+        return  (formattedHr.toInt() * 60) + formattedMin.toInt()
     }
 }
