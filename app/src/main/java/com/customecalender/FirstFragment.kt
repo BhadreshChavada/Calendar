@@ -52,7 +52,7 @@ class FirstFragment : Fragment() {
             "2023-09-19T23:00:00",
             "Single Color",
             array,
-            true
+            false
         )
 
 

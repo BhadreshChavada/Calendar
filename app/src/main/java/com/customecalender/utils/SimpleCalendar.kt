@@ -23,6 +23,7 @@ import com.customecalender.TripBreakdownData
 import com.customecalender.databinding.LayoutDayBinding
 import com.customecalender.databinding.TripBreakdownBarBinding
 import com.customecalender.databinding.TripBreakdownTitleBinding
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Calendar
@@ -491,7 +492,10 @@ class SimpleCalendar : LinearLayout {
                 weekEndDay = LocalDate.parse(reFormatDate(endDateString)).dayOfWeek.value
 
                 if (startDateWeekOfMonth != endDateWeekOfMonth) {
+//                    Log.d("total mins: ", timeDifferenceInMinutes(startDate, endDate).toString())
+//                    Log.d("end date of same week: ", getLastDateOfSameWeek(startDate).toString())
                     val width = (this.width ?: 1) / 7
+                    val decimalFormat = DecimalFormat("#.##")
                     for (i in startDateWeekOfMonth..endDateWeekOfMonth) {
                         if(weekStartDay == 7){
                             weekStartDay=0
@@ -499,12 +503,17 @@ class SimpleCalendar : LinearLayout {
                         if (i == startDateWeekOfMonth) {
                             val additionalStartMargin =
                                 width * getHrMinFromDate(startDateString) / (24 * 60)
-
+                            val diff =
+                                timeDifferenceInMinutes(startDate, getLastDateOfSameWeek(startDate))
+                            val total = timeDifferenceInMinutes(startDate, endDate)
+                            val percentage = decimalFormat.format(diff.toDouble() / total.toDouble()).toDouble()
+                            Log.d("diff from first week: ", timeDifferenceInMinutes(startDate, getLastDateOfSameWeek(startDate)).toString())
+                            Log.d("allowed : ", percentage.toString())
                             this.multiColorDrawBar(
                                 (width * weekStartDay) + additionalStartMargin,
                                 0,
                                 startDateWeekOfMonth,
-                                array,
+                                prepareTripData(array, percentage),
                                 singleColor
                             )
                         } else if (i == endDateWeekOfMonth) {
@@ -566,6 +575,22 @@ class SimpleCalendar : LinearLayout {
         }
     }
 
+    private fun prepareTripData(array: ArrayList<TripBreakdownData>, percentage: Double) : ArrayList<TripBreakdownData>{
+        val resultArray = arrayListOf<TripBreakdownData>()
+        // totalOccupiedPercentageCount
+        var totalPercentage: Double = 0.0
+        for (data in array) {
+            if ((totalPercentage + data.Percentage) < percentage) {
+                resultArray.add(data)
+                totalPercentage = data.Percentage
+            } else {
+                 resultArray.add(TripBreakdownData(data.BreakdownType, (percentage - totalPercentage)))
+                break
+            }
+        }
+        return resultArray
+    }
+
     fun reFormatDate(date:String): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
         val output = SimpleDateFormat("yyyy-MM-dd")
@@ -585,4 +610,41 @@ class SimpleCalendar : LinearLayout {
         val formattedMin = min.format(mnd)
         return  (formattedHr.toInt() * 60) + formattedMin.toInt()
     }
+
+    fun timeDifferenceInMinutes(startDate: Date, endDate: Date): Long {
+        val startTimeMillis = startDate.time
+        val endTimeMillis = endDate.time
+
+        // Calculate the time difference in milliseconds
+        val timeDifferenceMillis = endTimeMillis - startTimeMillis
+
+        // Convert milliseconds to minutes (1 minute = 60,000 milliseconds)
+        val timeDifferenceMinutes = timeDifferenceMillis / 60000
+
+        return timeDifferenceMinutes
+    }
+
+    fun getLastDateOfSameWeek(inputDate: Date): Date {
+        val calendar = Calendar.getInstance()
+        calendar.time = inputDate
+
+        // Calculate the day of the week (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        // Calculate the number of days to add to reach the end of the week (Saturday)
+        val daysToAdd = 7 - dayOfWeek
+
+        // Add the days to the input date to get the last date of the week
+        calendar.add(Calendar.DAY_OF_MONTH, daysToAdd)
+
+        // Set the time to the end of the day (23:59:59)
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+
+        return calendar.time
+    }
+
+
 }
