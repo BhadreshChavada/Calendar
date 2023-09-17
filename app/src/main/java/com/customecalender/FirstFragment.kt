@@ -33,9 +33,9 @@ class FirstFragment : Fragment() {
 
         val array = arrayListOf<TripBreakdownData>()
         array.add(TripBreakdownData(1, 0.10))
-        array.add(TripBreakdownData(3, 0.50))
+        array.add(TripBreakdownData(3, 0.30))
         array.add(TripBreakdownData(4, 0.15))
-        array.add(TripBreakdownData(6, 0.10))
+        array.add(TripBreakdownData(6, 0.30))
         array.add(TripBreakdownData(1, 0.15))
 
         _binding?.squareDay?.drawLines(
@@ -49,7 +49,7 @@ class FirstFragment : Fragment() {
         _binding?.squareDay?.drawLines(
             _binding?.squareDay,
             "2023-09-15T14:00:00",
-            "2023-09-19T23:00:00",
+            "2023-09-27T23:00:00",
             "Single Color",
             array,
             false

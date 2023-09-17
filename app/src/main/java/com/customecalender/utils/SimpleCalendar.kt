@@ -477,6 +477,9 @@ class SimpleCalendar : LinearLayout {
             val startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).parse(startDateString)
             val endDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).parse(endDateString);
 
+            if (startDate == null || endDate == null) {
+                return@post
+            }
             val calendarInstance = Calendar.getInstance()
             calendarInstance.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
 
@@ -492,10 +495,11 @@ class SimpleCalendar : LinearLayout {
                 weekEndDay = LocalDate.parse(reFormatDate(endDateString)).dayOfWeek.value
 
                 if (startDateWeekOfMonth != endDateWeekOfMonth) {
-//                    Log.d("total mins: ", timeDifferenceInMinutes(startDate, endDate).toString())
-//                    Log.d("end date of same week: ", getLastDateOfSameWeek(startDate).toString())
+                    var totalOccupiedPercentage: Double = 0.00
                     val width = (this.width ?: 1) / 7
                     val decimalFormat = DecimalFormat("#.##")
+                    // Total minutes of trip
+                    val total = timeDifferenceInMinutes(startDate, endDate)
                     for (i in startDateWeekOfMonth..endDateWeekOfMonth) {
                         if(weekStartDay == 7){
                             weekStartDay=0
@@ -505,10 +509,10 @@ class SimpleCalendar : LinearLayout {
                                 width * getHrMinFromDate(startDateString) / (24 * 60)
                             val diff =
                                 timeDifferenceInMinutes(startDate, getLastDateOfSameWeek(startDate))
-                            val total = timeDifferenceInMinutes(startDate, endDate)
                             val percentage = decimalFormat.format(diff.toDouble() / total.toDouble()).toDouble()
                             Log.d("diff from first week: ", timeDifferenceInMinutes(startDate, getLastDateOfSameWeek(startDate)).toString())
                             Log.d("allowed : ", percentage.toString())
+                            totalOccupiedPercentage = percentage // 10
                             this.multiColorDrawBar(
                                 (width * weekStartDay) + additionalStartMargin,
                                 0,
@@ -518,22 +522,24 @@ class SimpleCalendar : LinearLayout {
                             )
                         } else if (i == endDateWeekOfMonth) {
                             val additionalEndMargin = width - (width * getHrMinFromDate(endDateString) / (24 * 60))
-
                             this.multiColorDrawBar(
                                 0,
                                 (width * (6 - weekEndDay))+additionalEndMargin,
                                 endDateWeekOfMonth,
-                                array,
+                                prepareTripDataEndDates(array, totalOccupiedPercentage),
                                 singleColor
                             )
                         } else {
+                            val fullWeekMinutes = 7 * 24 * 60
+                            val percentage = decimalFormat.format(fullWeekMinutes.toDouble() / total.toDouble()).toDouble()
                             this.multiColorDrawBar(
                                 0,
                                 0,
                                 i,
-                                array,
+                                prepareTripDataForWholeWeek(array, percentage, totalOccupiedPercentage),
                                 singleColor
                             )
+                            totalOccupiedPercentage += percentage
                         }
                     }
                     if (startDateTitle.isNotEmpty()) {
@@ -582,36 +588,100 @@ class SimpleCalendar : LinearLayout {
         for (data in array) {
             if ((totalPercentage + data.Percentage) < percentage) {
                 resultArray.add(data)
-                totalPercentage = data.Percentage
+                totalPercentage += data.Percentage
             } else {
-                 resultArray.add(TripBreakdownData(data.BreakdownType, (percentage - totalPercentage)))
+                resultArray.add(TripBreakdownData(data.BreakdownType, (percentage - totalPercentage)))
                 break
             }
         }
         return resultArray
     }
 
-    fun reFormatDate(date:String): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-        val output = SimpleDateFormat("yyyy-MM-dd")
+    private fun prepareTripDataForWholeWeek(
+        array: ArrayList<TripBreakdownData>,
+        percentage: Double,
+        totalOccupiedPercentage: Double
+    ) : ArrayList<TripBreakdownData> {
+        val resultArray = arrayListOf<TripBreakdownData>()
+
+        val maxLimitOfPercentage = percentage + totalOccupiedPercentage
+
+        // totalOccupiedPercentageCount
+        var totalPercentage: Double = 0.0
+        var needToSkip = true
+
+        for (data in array) {
+            if(needToSkip) {
+
+                if ((totalPercentage + data.Percentage) < totalOccupiedPercentage) {
+                    totalPercentage += data.Percentage
+                    continue
+                } else {
+                    val remaining = data.Percentage - (totalOccupiedPercentage - totalPercentage)
+                    resultArray.add(TripBreakdownData(data.BreakdownType, remaining))
+                    needToSkip = false
+                    totalPercentage += data.Percentage
+                }
+            } else if(totalPercentage + data.Percentage < maxLimitOfPercentage) {
+                resultArray.add(data)
+                totalPercentage += data.Percentage
+            } else {
+                resultArray.add(TripBreakdownData(data.BreakdownType, (percentage - totalPercentage)))
+                totalPercentage += data.Percentage
+                break
+            }
+        }
+        return resultArray
+    }
+
+    private fun prepareTripDataEndDates(
+        array: ArrayList<TripBreakdownData>,
+        totalOccupiedPercentage: Double
+    ): ArrayList<TripBreakdownData> {
+
+        val resultArray = arrayListOf<TripBreakdownData>()
+        // totalOccupiedPercentageCount
+        var totalPercentage: Double = 0.0
+        var needToSkip = true
+
+        for (data in array) {
+            if (needToSkip) {
+                if ((totalPercentage + data.Percentage) < totalOccupiedPercentage) {
+                    totalPercentage += data.Percentage
+                    continue
+                } else {
+                    val remaining = data.Percentage - (totalOccupiedPercentage - totalPercentage)
+                    resultArray.add(TripBreakdownData(data.BreakdownType, remaining))
+                    needToSkip = false
+                }
+            } else {
+                resultArray.add(data)
+            }
+        }
+        return resultArray
+    }
+
+    private fun reFormatDate(date: String): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+        val output = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val d: Date = sdf.parse(date)
         val formattedTime = output.format(d)
         return formattedTime
     }
 
-    fun getHrMinFromDate(date:String): Int {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-        val hr = SimpleDateFormat("HH")
+    private fun getHrMinFromDate(date:String): Int {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",Locale.ENGLISH)
+        val hr = SimpleDateFormat("HH",Locale.ENGLISH)
         val hrd: Date = sdf.parse(date)
         val formattedHr = hr.format(hrd)
 
-        val min = SimpleDateFormat("mm")
+        val min = SimpleDateFormat("mm",Locale.ENGLISH)
         val mnd: Date = sdf.parse(date)
         val formattedMin = min.format(mnd)
         return  (formattedHr.toInt() * 60) + formattedMin.toInt()
     }
 
-    fun timeDifferenceInMinutes(startDate: Date, endDate: Date): Long {
+    private fun timeDifferenceInMinutes(startDate: Date, endDate: Date): Long {
         val startTimeMillis = startDate.time
         val endTimeMillis = endDate.time
 
@@ -624,7 +694,7 @@ class SimpleCalendar : LinearLayout {
         return timeDifferenceMinutes
     }
 
-    fun getLastDateOfSameWeek(inputDate: Date): Date {
+    private fun getLastDateOfSameWeek(inputDate: Date): Date {
         val calendar = Calendar.getInstance()
         calendar.time = inputDate
 
